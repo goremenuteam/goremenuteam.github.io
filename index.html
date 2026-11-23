@@ -19,6 +19,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 2rem 1rem;
         }
         .container {
             background: #18181f;
@@ -26,25 +27,69 @@
             border-radius: 12px;
             border: 1px solid #2a2a35;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            max-width: 600px;
-            width: 90%;
+            max-width: 800px;
+            width: 100%;
             text-align: center;
         }
         h1 {
             font-size: 2.2rem;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
             color: #ffffff;
             letter-spacing: 0.5px;
         }
-        p {
+        p.subtitle {
             font-size: 1.1rem;
             color: #a0a0b0;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .projects-header {
+            text-align: left;
+            font-size: 1.4rem;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #2a2a35;
+            padding-bottom: 0.5rem;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .project-card {
+            background: #21212b;
+            border: 1px solid #2a2a35;
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+            border-color: #6200ee;
+        }
+        .project-title {
+            font-size: 1.2rem;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        .project-desc {
+            font-size: 0.95rem;
+            color: #a0a0b0;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        .project-links {
+            display: flex;
+            gap: 0.5rem;
         }
         .btn {
             display: inline-block;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #ffffff;
             background-color: #6200ee;
@@ -53,17 +98,98 @@
             text-decoration: none;
             cursor: pointer;
             transition: background 0.2s ease-in-out;
+            text-align: center;
         }
         .btn:hover {
             background-color: #4b00b5;
+        }
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #6200ee;
+            color: #ffffff;
+        }
+        .btn-outline:hover {
+            background-color: #6200ee;
+        }
+        .loading {
+            color: #a0a0b0;
+            font-style: italic;
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        .org-btn {
+            display: inline-block;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>GORE Menu Team</h1>
-        <p>Official page for GORE Menu projects and releases.</p>
-        <a href="https://github.com/goremenuteam" class="btn" target="_blank" rel="noopener">Visit Our GitHub</a>
+        <p class="subtitle">Official page for GORE Menu projects and releases.</p>
+
+        <h2 class="projects-header">Our Projects</h2>
+        <div class="projects-grid" id="projects-grid">
+            <div class="loading">Loading repositories from GitHub...</div>
+        </div>
+
+        <a href="https://github.com/goremenuteam" class="btn org-btn" target="_blank" rel="noopener">Visit Our GitHub</a>
     </div>
+
+    <script>
+        async function fetchProjects() {
+            const grid = document.getElementById('projects-grid');
+            try {
+                const response = await fetch('https://api.github.com/users/goremenuteam/repos');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch repositories');
+                }
+                const repos = await response.json();
+
+                grid.innerHTML = '';
+
+                if (repos.length === 0) {
+                    grid.innerHTML = '<div class="loading">No public repositories found.</div>';
+                    return;
+                }
+
+                repos.forEach(repo => {
+                    if (repo.fork) return;
+
+                    const card = document.createElement('div');
+                    card.className = 'project-card';
+
+                    const hasPages = repo.has_pages;
+                    const homepage = repo.homepage;
+
+                    let primaryLink = repo.html_url;
+                    let primaryText = 'GitHub Repo';
+
+                    if (homepage) {
+                        primaryLink = homepage;
+                        primaryText = 'Open Project';
+                    }
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="project-title">${repo.name}</div>
+                            <div class="project-desc">${repo.description || 'No description provided.'}</div>
+                        </div>
+                        <div class="project-links">
+                            <a href="${primaryLink}" class="btn" target="_blank" rel="noopener">${primaryText}</a>
+                            ${homepage ? `<a href="${repo.html_url}" class="btn btn-outline" target="_blank" rel="noopener">Source</a>` : ''}
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                grid.innerHTML = '<div class="loading">Unable to load projects automatically. Check out our GitHub profile below!</div>';
+            }
+        }
+
+        fetchProjects();
+    </script>
 </body>
 </html>
