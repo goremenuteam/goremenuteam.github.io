@@ -42,6 +42,47 @@
             color: #a0a0b0;
             margin-bottom: 2rem;
         }
+        .player-bar {
+            background: #21212b;
+            border: 1px solid #2a2a35;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .player-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .track-info {
+            text-align: left;
+        }
+        .track-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .track-status {
+            font-size: 0.85rem;
+            color: #a0a0b0;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .video-preview {
+            width: 100%;
+            max-height: 360px;
+            border-radius: 8px;
+            background: #0b0b0e;
+            border: 1px solid #2a2a35;
+        }
         .projects-header {
             text-align: left;
             font-size: 1.4rem;
@@ -129,15 +170,72 @@
         <h1>GORE Menu Team</h1>
         <p class="subtitle">Official page for GORE Menu projects and releases.</p>
 
+        <div class="player-bar">
+            <div class="player-top">
+                <div class="track-info">
+                    <div class="track-title">Femboy Friday</div>
+                    <div class="track-status" id="player-status">Ready to play</div>
+                </div>
+                <div class="controls">
+                    <button class="btn" id="toggle-play" type="button">Play</button>
+                    <button class="btn btn-outline" id="toggle-mute" type="button">Mute</button>
+                </div>
+            </div>
+            <video id="media-player" class="video-preview" controls playsinline preload="metadata">
+                <source src="femboy-friday.mp4" type="video/mp4">
+                <source src="femboy-friday.mp3" type="audio/mpeg">
+            </video>
+        </div>
+
         <h2 class="projects-header">Our Projects</h2>
         <div class="projects-grid" id="projects-grid">
             <div class="loading">Loading repositories from GitHub...</div>
         </div>
 
-        <a href="https://github.com/goremenuteam" class="btn org-btn" target="_blank" rel="noopener">Visit Our GitHub</a>
+        <a href="https://github.com/goremenuteam" class="btn org-btn" target="_blank" rel="noopener">Visit Our GitHub Profile</a>
     </div>
 
     <script>
+        const player = document.getElementById('media-player');
+        const togglePlayBtn = document.getElementById('toggle-play');
+        const toggleMuteBtn = document.getElementById('toggle-mute');
+        const statusEl = document.getElementById('player-status');
+
+        togglePlayBtn.addEventListener('click', async () => {
+            if (player.paused) {
+                try {
+                    await player.play();
+                    togglePlayBtn.textContent = 'Pause';
+                    statusEl.textContent = 'Playing Femboy Friday';
+                } catch (err) {
+                    statusEl.textContent = 'Add femboy-friday.mp4 or femboy-friday.mp3 to your repo';
+                }
+            } else {
+                player.pause();
+                togglePlayBtn.textContent = 'Play';
+                statusEl.textContent = 'Paused';
+            }
+        });
+
+        toggleMuteBtn.addEventListener('click', () => {
+            player.muted = !player.muted;
+            toggleMuteBtn.textContent = player.muted ? 'Unmute' : 'Mute';
+        });
+
+        player.addEventListener('play', () => {
+            togglePlayBtn.textContent = 'Pause';
+            statusEl.textContent = 'Playing Femboy Friday';
+        });
+
+        player.addEventListener('pause', () => {
+            togglePlayBtn.textContent = 'Play';
+            statusEl.textContent = 'Paused';
+        });
+
+        player.addEventListener('error', () => {
+            statusEl.textContent = 'Media file not found (place femboy-friday.mp4 or .mp3 alongside main.html)';
+        });
+
         async function fetchProjects() {
             const grid = document.getElementById('projects-grid');
             try {
@@ -160,9 +258,7 @@
                     const card = document.createElement('div');
                     card.className = 'project-card';
 
-                    const hasPages = repo.has_pages;
                     const homepage = repo.homepage;
-
                     let primaryLink = repo.html_url;
                     let primaryText = 'GitHub Repo';
 
