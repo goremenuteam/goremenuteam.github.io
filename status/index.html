@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModsMenu - Status</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            background-color: #0d0d11;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            perspective: 1000px;
+            position: relative;
+        }
+        .container {
+            background: linear-gradient(145deg, #1d1d26, #15151c);
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid #2e2e3d;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            transform-style: preserve-3d;
+            transform: translateY(-5px);
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(98, 0, 238, 0.3);
+        }
+        p.subtitle {
+            font-size: 1.1rem;
+            color: #a0a0b0;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .overall-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #282836;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            background-color: #888;
+            box-shadow: 0 0 8px currentColor;
+        }
+        .status-dot.operational {
+            background-color: #2ec4b6;
+            color: #2ec4b6;
+        }
+        .status-dot.degraded {
+            background-color: #ff9f1c;
+            color: #ff9f1c;
+        }
+        .status-dot.offline {
+            background-color: #e71d36;
+            color: #e71d36;
+        }
+        .section-header {
+            text-align: left;
+            font-size: 1.4rem;
+            color: #ffffff;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid #2a2a35;
+            padding-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .clip-wrapper {
+            position: relative;
+            margin-bottom: 2rem;
+            perspective: 1000px;
+        }
+        .gray-plate {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: -15px;
+            bottom: -15px;
+            background: linear-gradient(135deg, #3a3a4c, #272736);
+            border: 1px solid #4a4a60;
+            border-radius: 14px;
+            z-index: 1;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+        .modlist-card {
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(145deg, #252533, #1c1c26);
+            border: 1px solid #333345;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: left;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.4),
+                0 4px 6px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transform-style: preserve-3d;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .clip-wrapper:hover .modlist-card {
+            transform: translateY(-6px) rotateX(2deg) rotateY(-1deg) scale(1.01);
+            border-color: #7b2cbf;
+            box-shadow: 
+                0 20px 30px rgba(0, 0, 0, 0.6),
+                0 0 15px rgba(123, 44, 191, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .service-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #121218;
+            border: 1px solid #282836;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .service-row:last-child {
+            margin-bottom: 0;
+        }
+        .service-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            text-align: left;
+        }
+        .service-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .service-url {
+            font-size: 0.85rem;
+            color: #7a7a90;
+            word-break: break-all;
+        }
+        .service-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .latency-tag {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.85rem;
+            color: #b0b0c2;
+            background: #1a1a24;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            border: 1px solid #2e2e3d;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge.operational {
+            background: rgba(46, 196, 182, 0.15);
+            color: #2ec4b6;
+            border: 1px solid rgba(46, 196, 182, 0.3);
+        }
+        .badge.offline {
+            background: rgba(231, 29, 54, 0.15);
+            color: #e71d36;
+            border: 1px solid rgba(231, 29, 54, 0.3);
+        }
+        .badge.checking {
+            background: rgba(255, 159, 28, 0.15);
+            color: #ff9f1c;
+            border: 1px solid rgba(255, 159, 28, 0.3);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(145deg, #7b2cbf, #5a189a);
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            text-align: center;
+        }
+        .btn:hover {
+            background: linear-gradient(145deg, #9d4edd, #7b2cbf);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(123, 44, 191, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .bottom-left-links {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .bottom-left-links .github-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(25, 25, 35, 0.9);
+            border: 1px solid #333345;
+            color: #e0e0e0;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+        }
+        .bottom-left-links .github-btn:hover {
+            background: #252533;
+            color: #ffffff;
+            border-color: #7b2cbf;
+            transform: translateY(-2px);
+        }
+        .bottom-left-links svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 600px) {
+            .bottom-left-links {
+                position: static;
+                margin-top: 1.5rem;
+                justify-content: center;
+            }
+            .service-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .service-status {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ModsMenu Status</h1>
+        <p class="subtitle">Real-time operational status for ModsMenu services.</p>
+
+        <div class="overall-status" id="overall-status">
+            <span class="status-dot checking" id="overall-dot"></span>
+            <span id="overall-text">Checking system status...</span>
+        </div>
+
+        <h2 class="section-header">Services</h2>
+
+        <div class="clip-wrapper">
+            <div class="gray-plate"></div>
+            <div class="modlist-card">
+                <div class="service-row">
+                    <div class="service-info">
+                        <span class="service-name">GitHub Repo</span>
+                        <span class="service-url">github.com/goremenuteam/ModsMenu</span>
+                    </div>
+                    <div class="service-status">
+                        <span class="latency-tag" id="repo-ping">-- ms</span>
+                        <span class="badge checking" id="repo-badge">
+                            <span class="status-dot checking"></span> Checking
+                        </span>
+                    </div>
+                </div>
+                <div class="service-row">
+                    <div class="service-info">
+                        <span class="service-name">GitHub Pages/Teh Website</span>
+                        <span class="service-url">goremenuteam.github.io</span>
+                    </div>
+                    <div class="service-status">
+                        <span class="latency-tag" id="pages-ping">-- ms</span>
+                        <span class="badge checking" id="pages-badge">
+                            <span class="status-dot checking"></span> Checking
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-left-links">
+        <a href="https://github.com/goremenuteam/ModsMenu" class="github-btn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            GitHub Repository
+        </a>
+    </div>
+
+    <script>
+        async function checkService(url, badgeId, pingId) {
+            const badge = document.getElementById(badgeId);
+            const ping = document.getElementById(pingId);
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-cache' });
+                const endTime = performance.now();
+                const latency = Math.round(endTime - startTime);
+
+                ping.textContent = `${latency} ms`;
+                badge.className = 'badge operational';
+                badge.innerHTML = `<span class="status-dot operational"></span> Operational`;
+                return true;
+            } catch (error) {
+                const endTime = performance.now();
+                const latency = Math.round(endTime - startTime);
+                
+                ping.textContent = `${latency} ms`;
+                badge.className = 'badge offline';
+                badge.innerHTML = `<span class="status-dot offline"></span> Offline`;
+                return false;
+            }
+        }
+
+        async function updateAllStatuses() {
+            const repoUrl = 'https://raw.githubusercontent.com/goremenuteam/ModsMenu/main/README.md';
+            const pagesUrl = 'https://goremenuteam.github.io/';
+
+            const [repoOnline, pagesOnline] = await Promise.all([
+                checkService(repoUrl, 'repo-badge', 'repo-ping'),
+                checkService(pagesUrl, 'pages-badge', 'pages-ping')
+            ]);
+
+            const overallDot = document.getElementById('overall-dot');
+            const overallText = document.getElementById('overall-text');
+
+            if (repoOnline && pagesOnline) {
+                overallDot.className = 'status-dot operational';
+                overallText.textContent = 'All Systems Operational';
+            } else if (repoOnline || pagesOnline) {
+                overallDot.className = 'status-dot degraded';
+                overallText.textContent = 'Partial Service Outage';
+            } else {
+                overallDot.className = 'status-dot offline';
+                overallText.textContent = 'Major Service Outage';
+            }
+        }
+
+        updateAllStatuses();
+        setInterval(updateAllStatuses, 30000);
+    </script>
+</body>
+</html>
