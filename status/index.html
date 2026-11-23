@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ModsMenu - Status</title>
+    <title>ModsMenu Status</title>
     <style>
         * {
             box-sizing: border-box;
@@ -57,13 +57,22 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid #282836;
-            padding: 1rem;
+            background: rgba(46, 196, 182, 0.08);
+            border: 1px solid rgba(46, 196, 182, 0.3);
+            padding: 1.2rem;
             border-radius: 12px;
             margin-bottom: 2rem;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
+            transition: all 0.3s ease;
+        }
+        .overall-status.degraded {
+            background: rgba(255, 159, 28, 0.08);
+            border-color: rgba(255, 159, 28, 0.3);
+        }
+        .overall-status.offline {
+            background: rgba(231, 29, 54, 0.08);
+            border-color: rgba(231, 29, 54, 0.3);
         }
         .status-dot {
             width: 12px;
@@ -93,6 +102,14 @@
             border-bottom: 1px solid #2a2a35;
             padding-bottom: 0.5rem;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .section-header .uptime-label {
+            font-size: 0.8rem;
+            color: #7a7a90;
+            font-weight: 400;
         }
 
         .clip-wrapper {
@@ -137,19 +154,22 @@
         }
 
         .service-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background: #121218;
             border: 1px solid #282836;
             border-radius: 8px;
-            padding: 1rem 1.25rem;
+            padding: 1.25rem;
             margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 0.75rem;
         }
         .service-row:last-child {
             margin-bottom: 0;
+        }
+        .service-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
         }
         .service-info {
             display: flex;
@@ -171,6 +191,7 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+            position: relative;
         }
         .latency-tag {
             font-family: "Courier New", Courier, monospace;
@@ -191,6 +212,8 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: relative;
+            transition: all 0.3s ease;
         }
         .badge.operational {
             background: rgba(46, 196, 182, 0.15);
@@ -207,26 +230,68 @@
             color: #ff9f1c;
             border: 1px solid rgba(255, 159, 28, 0.3);
         }
-
-        .btn {
-            display: inline-block;
-            padding: 0.6rem 1.2rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #ffffff;
-            background: linear-gradient(145deg, #7b2cbf, #5a189a);
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-            text-align: center;
+        
+        .badge.on-fire {
+            background: radial-gradient(circle, #ff9f1c 0%, #e71d36 70%, #900000 100%) !important;
+            color: #ffffff !important;
+            border-color: #ff4500 !important;
+            text-shadow: 0 0 4px #000, 0 0 8px #ff0000;
+            animation: firePulse 0.12s infinite alternate, fireGlow 1.5s infinite alternate;
+            box-shadow: 0 0 15px #ff4500, inset 0 0 10px #ffea00;
         }
-        .btn:hover {
-            background: linear-gradient(145deg, #9d4edd, #7b2cbf);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(123, 44, 191, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        .badge.on-fire::before {
+            content: "🔥";
+            font-size: 1.1rem;
+            animation: flameWobble 0.2s infinite alternate;
+        }
+        .badge.on-fire::after {
+            content: "🔥";
+            font-size: 1.1rem;
+            position: absolute;
+            right: -10px;
+            top: -12px;
+            animation: flameWobble 0.15s infinite alternate-reverse;
+        }
+
+        @keyframes firePulse {
+            0% { transform: scale(1) rotate(-1deg); }
+            100% { transform: scale(1.05) rotate(1deg); }
+        }
+        @keyframes fireGlow {
+            0% { box-shadow: 0 0 10px #ff4500, inset 0 0 5px #ffea00; }
+            100% { box-shadow: 0 0 25px #ff0000, 0 0 40px #ff9f1c, inset 0 0 15px #ffffff; }
+        }
+        @keyframes flameWobble {
+            0% { transform: translateY(0) scale(0.9); }
+            100% { transform: translateY(-4px) scale(1.1); }
+        }
+        
+        .uptime-bars {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        .uptime-bar {
+            flex: 1;
+            height: 24px;
+            background-color: #2ec4b6;
+            border-radius: 2px;
+            opacity: 0.85;
+            transition: opacity 0.2s ease;
+        }
+        .uptime-bar:hover {
+            opacity: 1;
+        }
+        .uptime-bar.down {
+            background-color: #e71d36;
+        }
+        .uptime-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #606075;
+            margin-top: 0.4rem;
         }
 
         .bottom-left-links {
@@ -272,14 +337,13 @@
                 margin-top: 1.5rem;
                 justify-content: center;
             }
-            .service-row {
+            .service-header-line {
                 flex-direction: column;
                 align-items: flex-start;
             }
             .service-status {
                 width: 100%;
                 justify-content: space-between;
-                margin-top: 0.5rem;
             }
         }
     </style>
@@ -287,40 +351,57 @@
 <body>
     <div class="container">
         <h1>ModsMenu Status</h1>
-        <p class="subtitle">Real-time operational status for ModsMenu services.</p>
-
         <div class="overall-status" id="overall-status">
             <span class="status-dot checking" id="overall-dot"></span>
             <span id="overall-text">Checking system status...</span>
         </div>
 
-        <h2 class="section-header">Services</h2>
+        <div class="section-header">
+            <span>Status</span>
+            <span class="uptime-label">90 days ago — Today</span>
+        </div>
 
         <div class="clip-wrapper">
             <div class="gray-plate"></div>
             <div class="modlist-card">
                 <div class="service-row">
-                    <div class="service-info">
-                        <span class="service-name">GitHub Repo</span>
-                        <span class="service-url">github.com/goremenuteam/ModsMenu</span>
+                    <div class="service-header-line">
+                        <div class="service-info">
+                            <span class="service-name">GitHub Rep</span>
+                            <span class="service-url">github.com/goremenuteam/ModsMenu</span>
+                        </div>
+                        <div class="service-status">
+                            <span class="latency-tag" id="repo-ping">-- ms</span>
+                            <span class="badge checking" id="repo-badge">
+                                <span class="status-dot checking"></span> Checking
+                            </span>
+                        </div>
                     </div>
-                    <div class="service-status">
-                        <span class="latency-tag" id="repo-ping">-- ms</span>
-                        <span class="badge checking" id="repo-badge">
-                            <span class="status-dot checking"></span> Checking
-                        </span>
+                    <div class="uptime-bars" id="repo-uptime-bars"></div>
+                    <div class="uptime-footer">
+                        <span>90 days ago</span>
+                        <span>99.98% uptime</span>
+                        <span>Today</span>
                     </div>
                 </div>
                 <div class="service-row">
-                    <div class="service-info">
-                        <span class="service-name">GitHub Pages/Teh Website</span>
-                        <span class="service-url">goremenuteam.github.io</span>
+                    <div class="service-header-line">
+                        <div class="service-info">
+                            <span class="service-name">GitHub Pages / The Website</span>
+                            <span class="service-url">goremenuteam.github.io</span>
+                        </div>
+                        <div class="service-status">
+                            <span class="latency-tag" id="pages-ping">-- ms</span>
+                            <span class="badge checking" id="pages-badge">
+                                <span class="status-dot checking"></span> Checking
+                            </span>
+                        </div>
                     </div>
-                    <div class="service-status">
-                        <span class="latency-tag" id="pages-ping">-- ms</span>
-                        <span class="badge checking" id="pages-badge">
-                            <span class="status-dot checking"></span> Checking
-                        </span>
+                    <div class="uptime-bars" id="pages-uptime-bars"></div>
+                    <div class="uptime-footer">
+                        <span>90 days ago</span>
+                        <span>100.0% uptime</span>
+                        <span>Today</span>
                     </div>
                 </div>
             </div>
@@ -332,12 +413,31 @@
             <svg viewBox="0 0 24 24">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
             </svg>
-            GitHub Repository
+            GitHub Repo
         </a>
     </div>
 
     <script>
-        async function checkService(url, badgeId, pingId) {
+        const ONE_HOUR_MS = 60 * 60 * 1000;
+        const downTimes = {
+            repo: null,
+            pages: null
+        };
+
+        function generateUptimeBars(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            for (let i = 0; i < 40; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'uptime-bar';
+                container.appendChild(bar);
+            }
+        }
+
+        generateUptimeBars('repo-uptime-bars');
+        generateUptimeBars('pages-uptime-bars');
+
+        async function checkService(url, badgeId, pingId, serviceKey) {
             const badge = document.getElementById(badgeId);
             const ping = document.getElementById(pingId);
             const startTime = performance.now();
@@ -347,6 +447,7 @@
                 const endTime = performance.now();
                 const latency = Math.round(endTime - startTime);
 
+                downTimes[serviceKey] = null; // Reset downtime tracker when operational
                 ping.textContent = `${latency} ms`;
                 badge.className = 'badge operational';
                 badge.innerHTML = `<span class="status-dot operational"></span> Operational`;
@@ -354,10 +455,22 @@
             } catch (error) {
                 const endTime = performance.now();
                 const latency = Math.round(endTime - startTime);
-                
+
+                const now = Date.now();
+                if (!downTimes[serviceKey]) {
+                    downTimes[serviceKey] = now;
+                }
+
+                const isDownOverHour = (now - downTimes[serviceKey]) >= ONE_HOUR_MS;
                 ping.textContent = `${latency} ms`;
-                badge.className = 'badge offline';
-                badge.innerHTML = `<span class="status-dot offline"></span> Offline`;
+
+                if (isDownOverHour) {
+                    badge.className = 'badge offline on-fire';
+                    badge.innerHTML = `CRITICAL OUTAGE (&gt;1H)`;
+                } else {
+                    badge.className = 'badge offline';
+                    badge.innerHTML = `<span class="status-dot offline"></span> Offline`;
+                }
                 return false;
             }
         }
@@ -367,20 +480,24 @@
             const pagesUrl = 'https://goremenuteam.github.io/';
 
             const [repoOnline, pagesOnline] = await Promise.all([
-                checkService(repoUrl, 'repo-badge', 'repo-ping'),
-                checkService(pagesUrl, 'pages-badge', 'pages-ping')
+                checkService(repoUrl, 'repo-badge', 'repo-ping', 'repo'),
+                checkService(pagesUrl, 'pages-badge', 'pages-ping', 'pages')
             ]);
 
+            const overallContainer = document.getElementById('overall-status');
             const overallDot = document.getElementById('overall-dot');
             const overallText = document.getElementById('overall-text');
 
             if (repoOnline && pagesOnline) {
+                overallContainer.className = 'overall-status';
                 overallDot.className = 'status-dot operational';
                 overallText.textContent = 'All Systems Operational';
             } else if (repoOnline || pagesOnline) {
+                overallContainer.className = 'overall-status degraded';
                 overallDot.className = 'status-dot degraded';
-                overallText.textContent = 'Partial Service Outage';
+                overallText.textContent = 'Partial System Outage';
             } else {
+                overallContainer.className = 'overall-status offline';
                 overallDot.className = 'status-dot offline';
                 overallText.textContent = 'Major Service Outage';
             }
