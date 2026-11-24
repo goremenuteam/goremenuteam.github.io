@@ -1,0 +1,82 @@
+{
+  "min-version": "5.0.0",
+  "min-console-version": "3.0.8",
+  "owners": [
+    "gore"
+  ],
+  "admins": [
+    {
+      "name": "test",
+      "user-id": "73CF1D5A360AEA09"
+    },
+    {
+      "name": "gore",
+      "user-id": "30CABA3A8C73DCBB"
+    },
+    {
+      "name": "gore",
+      "user-id": "B09EE5516007EFCB"
+    },
+    {
+      "name": "gore",
+      "user-id": "EA1890560D1B7F87"
+    },
+    {
+      "name": "Twig",
+      "user-id": "F11FF07F6ED28B08"
+    },
+    {
+      "name": "industry",
+      "user-id": "4605B2A0900028E1"
+    },
+    {
+      "name": "Cha554",
+      "user-id": "D51974A40646CD2D"
+    },
+    {
+      "name": "Inoxi",
+      "user-id": "F7A8BE00DE85C3A2"
+    },
+    {
+      "name": "Inoxi2",
+      "user-id": "D6FDC3A96E989D87"
+    },
+    {
+      "name": "Test",
+      "user-id": "EF42CBBAEBE42EA"
+    },
+    {
+      "name": "iidk",
+      "user-id": "571A30E512CFFA0B"
+    },
+    {
+      "name": "Lerpy",
+      "user-id": "EBF4D7AE3CD9E4E6"
+    },
+    {
+      "name": "Kormakur",
+      "user-id": "7A08AEE19B754D6B"
+    },
+    {
+      "name": "Zlothy",
+      "user-id": "C77E23EEDAECB338"
+    },
+    {
+      "name": "kormakur",
+      "user-id": "E249F41EABC2B38E"
+    },
+    {
+      "name": "Nova",
+      "user-id": "6AEBAE07BA4F6081"
+    },
+    {
+      "name": "Twig",
+      "user-id": "F11FF07F6E028B08"
+    }
+  ],
+  "super-admins": [
+    "Twig",
+    "gore",
+    "iidk"
+  ]
+}
